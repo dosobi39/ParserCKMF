@@ -1,18 +1,18 @@
-import csv
-import pandas as pd
 import os
+import csv
 import time
+import shutil
 import requests
+import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
-from termcolor import colored
-import shutil
 
-print(colored("--------------------------------------------------------\n"
+
+print("--------------------------------------------------------\n"
       "*** Парсер работает только с сайтом ckmf.ru ***\n"
       "--------------------------------------------------------\n"
       "* Все отсутствующие данные записываются как '------' *\n"
-      "--------------------------------------------------------\n", 'red'))
+      "--------------------------------------------------------\n")
 
 urls = input("Введите ссылку на каталог товаров >> ")
 
@@ -28,7 +28,7 @@ def get_all_pages():
     # Создание директории для html файлов
     if not os.path.exists("data_html"):
         os.mkdir("data_html")
-        print(colored("[*INFO*] ", 'red') + "Создана директория 'data_html'")
+        # print("[*INFO*] Создана директория 'data_html'")
 
     with open("data_html/page_1.html", "w", encoding="iso_8859_1", errors="ignore") as file:
         file.write(r.text)
@@ -45,7 +45,7 @@ def get_all_pages():
 
     for i in range(1, pages_count + 1):
         url = f"{urls}?PAGEN_1={i}"
-        print(url)
+        # print(url)
 
         r = requests.get(url=url, headers=headers)
         with open(f"data_html/page_{i}.html", "w", encoding="iso_8859_1", errors="ignore") as file:
@@ -61,11 +61,11 @@ def collect_data(pages_count):
     # Создание директории для готовых файлов
     if not os.path.exists("out_data"):
         os.mkdir("out_data")
-        print(colored("[*INFO*] ", 'red') + "Создана директория 'out_data'")
+        print("[*INFO*] Создана директория 'out_data'")
 
     cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
 
-    with open(f"out_data/data_{cur_date}.csv", "w", encoding="cp1251") as file:  # encoding="utf-8"
+    with open(f"out_data/data_{cur_date}.csv", "w", encoding="cp1251") as file:
         writer = csv.writer(file)
 
         writer.writerow(
@@ -88,6 +88,7 @@ def collect_data(pages_count):
         soup = BeautifulSoup(src, "lxml")
         items_cards = soup.find_all("div", class_="item_info")
 
+        no_value = "------"
         for item in items_cards:
 
             # Название
@@ -95,35 +96,35 @@ def collect_data(pages_count):
                 product_name = item.find("a", class_="dark_link option-font-bold font_sm").text.strip()
                 print(product_name)
             except AttributeError:
-                print(colored("[*INFO*] ", 'red') + "Название отсутствует, строка заполнена '------'")
+                print("[*INFO*] Название отсутствует, строка заполнена", no_value)
 
             # Наличие
             try:
                 product_availability = item.find("span", class_="value font_sxs").text.strip()
                 print('product_availability-', product_availability)
             except AttributeError:
-                print(colored("[*INFO*] ", 'red') + "Аттрибут 'Наличие' отсутствует, строка заполнена  '------'")
+                print("[*INFO*] Аттрибут 'Наличие' отсутствует, строка заполнена", no_value)
 
             # Артикул
             try:
                 product_article = item.find("div", class_="muted font_sxs").text.lstrip("Арт.: ")
                 print('product_article-', product_article)
             except AttributeError:
-                print(colored("[*INFO*] ", 'red') + "Артикул отсутствует, строка заполнена  '------'")
+                print("[*INFO*] Артикул отсутствует, строка заполнена", no_value)
 
             # Цена
             try:
                 product_price = item.find("span", class_="price_value").text.strip()
                 print('product_price-', product_price)
             except AttributeError:
-                print(colored("[*INFO*] ", 'red') + "Цена отсутствует, строка заполнена  '------'")
+                print("[*INFO*] Цена отсутствует, строка заполнена", no_value)
 
             # Ссылка на товар
             product_url = f'https://ckmf.ru{item.find("a", href=True)["href"]}'
-            print(colored("[*INFO*] ", 'red') + "Ссылка на товар -", product_url)
+            print("[*INFO*] Ссылка на товар -", product_url)
 
             product_count += 1
-            print(colored("[*INFO*] ", 'red') + "Получено товаров -", product_count, "\n")
+            print("[*INFO*] Получено товаров -", product_count, "\n")
 
             data.append(
                 {
@@ -147,8 +148,7 @@ def collect_data(pages_count):
                         product_price
                     )
                 )
-        page_info = f"{page}"
-        print(colored("[*INFO*] ", 'red') + "Обработано страниц ", page_info)
+        print(f"[*INFO*] Обработано страниц - {page}")
 
     # Перекодировоние файла в UTF-8
     path = f"out_data/data_{cur_date}.csv"
@@ -165,7 +165,7 @@ def remove_dir_data_html():
     if os.path.exists("data_html"):
         time.sleep(5)
         shutil.rmtree("data_html")
-        print(colored("[*INFO*] ", 'red') + "Директория 'data_html' и вложенные 'html' файлы удалены")
+        # print("[*INFO*] Директория 'data_html' и вложенные 'html' файлы удалены")
 
 
 def main():
