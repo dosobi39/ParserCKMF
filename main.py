@@ -45,7 +45,7 @@ def get_all_pages():
 
     for i in range(1, pages_count + 1):
         url = f"{urls}?PAGEN_1={i}"
-        # print(url)
+        print(f"Получение кода страницы {i}")
 
         r = requests.get(url=url, headers=headers)
         with open(f"data_html/page_{i}.html", "w", encoding="iso_8859_1", errors="ignore") as file:
@@ -64,8 +64,9 @@ def collect_data(pages_count):
         print("[*INFO*] Создана директория 'out_data'")
 
     cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    # cur_date = datetime.now().strftime("%d_%m_%Y")
 
-    with open(f"out_data/data_{cur_date}.csv", "w", encoding="cp1251") as file:
+    with open(f"out_data/data_{cur_date}.csv", "w", newline="", encoding="cp1251") as file:
         writer = csv.writer(file)
 
         writer.writerow(
@@ -94,7 +95,7 @@ def collect_data(pages_count):
             # Название
             try:
                 product_name = item.find("a", class_="dark_link option-font-bold font_sm").text.strip()
-                print(product_name)
+                print('product_name-', product_name)
             except AttributeError:
                 print("[*INFO*] Название отсутствует, строка заполнена", no_value)
 
@@ -136,18 +137,19 @@ def collect_data(pages_count):
                 }
             )
 
-            with open(f"out_data/data_{cur_date}.csv", "a", encoding="cp1251") as file:
-                writer = csv.writer(file)
+            if os.path.exists(f"out_data/data_{cur_date}.csv"):
+                with open(f"out_data/data_{cur_date}.csv", "a", newline="", encoding="cp1251") as file:
+                    writer = csv.writer(file)
 
-                writer.writerow(
-                    (
-                        product_article,
-                        product_name,
-                        product_url,
-                        product_availability,
-                        product_price
+                    writer.writerow(
+                        (
+                            product_article,
+                            product_name,
+                            product_url,
+                            product_availability,
+                            product_price
+                        )
                     )
-                )
         print(f"[*INFO*] Обработано страниц - {page}")
 
     # Перекодировоние файла в UTF-8
@@ -163,7 +165,7 @@ def collect_data(pages_count):
 # Удаление директории "data" вместе со всеми файлами
 def remove_dir_data_html():
     if os.path.exists("data_html"):
-        time.sleep(5)
+        # time.sleep(5)
         shutil.rmtree("data_html")
         # print("[*INFO*] Директория 'data_html' и вложенные 'html' файлы удалены")
 
