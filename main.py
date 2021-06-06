@@ -7,19 +7,20 @@ import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
 
-
 print("--------------------------------------------------------\n"
-      "*** Парсер работает только с сайтом ckmf.ru ***\n"
+      "* Парсер работает только с сайтом ckmf.ru *\n"
       "--------------------------------------------------------\n"
       "* Все отсутствующие данные записываются как '------' *\n"
       "--------------------------------------------------------\n")
 
-urls = input("Введите ссылку на каталог товаров >> ")
-
 
 def get_all_pages():
+    # Нужна проверка правильности ссылок
+    urls = input("Введите ссылку на каталог товаров >> ")
+    # print("[!!INFO!!] Введите корректную ссылку")
+
     headers = {
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept": "*/*",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0"
     }
 
@@ -57,7 +58,6 @@ def get_all_pages():
 
 
 def collect_data(pages_count):
-
     # Создание директории для готовых файлов
     if not os.path.exists("out_data"):
         os.mkdir("out_data")
@@ -150,12 +150,18 @@ def collect_data(pages_count):
                             product_price
                         )
                     )
-        print(f"[*INFO*] Обработано страниц - {page}")
+        print(f"[*INFO*] Обработано страниц - {page}\n")
 
     # Перекодировоние файла в UTF-8
     path = f"out_data/data_{cur_date}.csv"
     df = pd.read_csv(path, encoding='cp1251')
     df.to_csv(path, encoding='utf-8', index=False)
+
+    print(f"-------------------------------------------------------\n"
+          f"[*INFO*] Парсинг товаров по ссылке выполнен\n"
+          f"[*INFO*] Для парсинга с другой ссылки ждите запроса\n"
+          f"[*INFO*] Для завершения работы закройте программу\n"
+          f"-------------------------------------------------------\n")
 
     # Заготовка для получения файла json
     # with open(f"out_data/data_{cur_date}.json", "a") as file:
@@ -165,15 +171,16 @@ def collect_data(pages_count):
 # Удаление директории "data" вместе со всеми файлами
 def remove_dir_data_html():
     if os.path.exists("data_html"):
-        # time.sleep(5)
         shutil.rmtree("data_html")
+        time.sleep(5)
         # print("[*INFO*] Директория 'data_html' и вложенные 'html' файлы удалены")
 
 
 def main():
-    pages_count = get_all_pages()
-    collect_data(pages_count=pages_count)
-    remove_dir_data_html()
+    while True:
+        pages_count = get_all_pages()
+        collect_data(pages_count=pages_count)
+        remove_dir_data_html()
 
 
 if __name__ == '__main__':
