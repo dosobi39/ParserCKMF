@@ -8,7 +8,6 @@ import requests
 # import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
-from settings_custom import cur_date
 
 version = 1.1
 
@@ -81,7 +80,7 @@ def collect_data(pages_count):
         os.mkdir("out_data")
         print("[*INFO*] Создана директория 'out_data'")
 
-    # cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     # cur_date = datetime.now().strftime("%d_%m_%Y")
 
     with open(f"out_data/data_{cur_date}.csv", "w", newline="", encoding="utf-8") as file:    # , encoding="cp1251"
