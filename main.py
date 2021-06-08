@@ -8,6 +8,7 @@ import requests
 # import pandas as pd
 from bs4 import BeautifulSoup
 from datetime import datetime
+from settings_custom import cur_date
 
 version = 1.1
 
@@ -29,10 +30,10 @@ s_urls = None
 def get_all_pages():
     global s_urls, urls
     # Нужна проверка правильности ссылок
+    # urls = "https://ckmf.ru/catalog/komplektuyushchie_dlya_myagkoy_mebeli/napolniteli_dlya_mebeli/porolon/"
     urls = input("Введите ссылку на каталог товаров >> ")
     s_urls = re.search("(?P<url>https?://[^\s]+)", urls).group()
 
-    # urls = "https://ckmf.ru/catalog/komplektuyushchie_dlya_myagkoy_mebeli/napolniteli_dlya_mebeli/porolon/"
     # print("[!!INFO!!] Введите корректную ссылку")
 
     headers = {
@@ -80,10 +81,10 @@ def collect_data(pages_count):
         os.mkdir("out_data")
         print("[*INFO*] Создана директория 'out_data'")
 
-    cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
+    # cur_date = datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
     # cur_date = datetime.now().strftime("%d_%m_%Y")
 
-    with open(f"out_data/data_{cur_date}.csv", "w", encoding="utf-8") as file:    # , encoding="cp1251"
+    with open(f"out_data/data_{cur_date}.csv", "w", newline="", encoding="utf-8") as file:    # , encoding="cp1251"
         writer = csv.writer(file)
 
         writer.writerow(
@@ -116,7 +117,7 @@ def collect_data(pages_count):
                 print('Наименование - ', product_name)
 
             except AttributeError:
-                print("[*INFO*] Название отсутствует, строка заполнена", no_value)
+                print("[INFO] Название отсутствует, строка заполнена", no_value)
 
             # Наличие
             try:
@@ -124,7 +125,7 @@ def collect_data(pages_count):
                 print('Наличие ------ ', product_availability)
 
             except AttributeError:
-                print("[*INFO*] Аттрибут 'Наличие' отсутствует, строка заполнена", no_value)
+                print("[INFO] Аттрибут 'Наличие' отсутствует, строка заполнена", no_value)
 
             # Артикул
             try:
@@ -132,7 +133,7 @@ def collect_data(pages_count):
                 print('Артикул ------ ', product_article)
 
             except AttributeError:
-                print("[*INFO*] Артикул отсутствует, строка заполнена", no_value)
+                print("[INFO] Артикул отсутствует, строка заполнена", no_value)
 
             # Цена
             try:
@@ -140,14 +141,14 @@ def collect_data(pages_count):
                 print('Цена --------- ', product_price)
 
             except AttributeError:
-                print("[*INFO*] Цена отсутствует, строка заполнена", no_value)
+                print("[INFO] Цена отсутствует, строка заполнена", no_value)
 
             # Ссылка на товар
             product_url = f'https://ckmf.ru{item.find("a", href=True)["href"]}'
             print('Ссылка ------- ', product_url)
 
             product_count += 1
-            print("[*INFO*] Получено товаров -", product_count, "\n")
+            print("[INFO] Получено товаров -", product_count, "\n")
 
             data.append(
                 {
@@ -159,7 +160,7 @@ def collect_data(pages_count):
                 }
             )
 
-            with open(f"out_data/data_{cur_date}.csv", "a", encoding="utf-8") as file:    # , encoding="cp1251"
+            with open(f"out_data/data_{cur_date}.csv", "a", newline="", encoding="utf-8") as file:    # , encoding="cp1251"
                 writer = csv.writer(file)
 
                 writer.writerow(
@@ -179,10 +180,11 @@ def collect_data(pages_count):
           f"[INFO] Получено товаров -", product_count, "\n"
           f"-------------------------------------------------------\n"
           f"[INFO] Товары сохранены в директорию 'output_data'\n"
-          f"[INFO] -------в файл 'data_{cur_date}.csv'--------\n"
+          f"-------в файл 'data_{cur_date}.csv'\n"
           f"-------------------------------------------------------\n"
-          f"[* INFO *] Для завершения работы введите 'exit'\n"
-          f"-----------------или закройте программу----------------\n")
+          f"--Для завершения работы введите 'exit'\n"
+          f"--или закройте программу\n"
+          f"-------------------------------------------------------\n")
 
     # Перекодировоние файла в UTF-8
     # path = f"out_data/data_{cur_date}.csv"
@@ -218,10 +220,12 @@ def main():
                 os.system("cls")
                 print("-----------------------------------------------\n"
                       "[INFO] Вы ввели некорректную ссылку\n"
-                      "-------------повторите попытку-----------------\n"
+                      "------ повторите попытку\n"
                       "-----------------------------------------------\n"
-                      "[* INFO *] Для завершения работы введите 'exit'\n"
-                      "-----------------или закройте программу--------\n")
+                      "-- Для завершения работы введите 'exit'\n"
+                      "-- или закройте программу\n"
+                      "-----------------------------------------------\n")
+
                 time.sleep(1)
             else:
                 url_ok = True
