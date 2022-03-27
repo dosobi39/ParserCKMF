@@ -9,10 +9,7 @@ from scrapy.item import Item, Field
 class ParserCkmfSpider(CrawlSpider):
     name = 'parser_ckmf'
     allowed_domains = ['ckmf.ru']
-
-    # список категорий
-    start_urls = ['https://ckmf.ru/catalog/',
-                  ]
+    start_urls = ['https://ckmf.ru/catalog/']
 
     # allow =(разрешающие фильтры для парсинга)
     # deny=(запрещающие фильтры для парсинга)
@@ -94,3 +91,8 @@ class ParserCkmfSpider(CrawlSpider):
                         descriptions,
                     )
                 )
+
+    # def close(self, reason):
+    #     start_time = self.crawler.stats.get_value('start_time')
+    #     finish_time = self.crawler.stats.get_value('finish_time')
+    #     print('[*INFO*] Общее время выполнения: ', finish_time - start_time)
